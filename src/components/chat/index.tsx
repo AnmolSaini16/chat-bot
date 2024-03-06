@@ -22,7 +22,7 @@ const Chat = (props: Props) => {
     setLoading(true);
     try {
       const resp = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=AIzaSyAHu7ojdpZsfjIo5YEkp-GIwcVIKEirjpM",
+        `https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=${process.env.NEXT_PUBLIC_API_KEY}`,
         {
           method: "POST",
           headers: {
@@ -40,7 +40,10 @@ const Chat = (props: Props) => {
       setResults((prev) => [
         ...(prev ?? []),
         { from: "user", message: text },
-        { from: "bot", message: data?.candidates[0]?.output ?? "" },
+        {
+          from: "bot",
+          message: data?.candidates ? data?.candidates[0]?.output : "",
+        },
       ]);
       setText("");
     } catch (err) {
