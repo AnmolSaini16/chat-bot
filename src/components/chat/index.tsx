@@ -4,9 +4,9 @@ import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
-import { toast } from "../ui/use-toast";
-import { ChatResponseInterface, Result } from "./chat.interface";
+import { Result } from "./chat.interface";
 import Message from "./Message";
+import useSubmitUserChat from "@/hooks/useSubmitUserChat";
 
 type Props = {};
 
@@ -17,52 +17,20 @@ const Chat = (props: Props) => {
 
   const chatRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const { submitUserChat } = useSubmitUserChat({
+    setLoading,
+    setResults,
+    text,
+  });
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!text.length || loading) return;
 
-    setLoading(true);
-
-    setResults((prev) => [...(prev ?? []), { from: "user", message: text }]);
     setText("");
-    try {
-      const resp = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=${process.env.NEXT_PUBLIC_API_KEY}`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt: {
-              text,
-            },
-          }),
-        }
-      );
-      if (resp.ok) {
-        const data: ChatResponseInterface = await resp.json();
-        setResults((prev) => [
-          ...(prev ?? []),
-          {
-            from: "bot",
-            message: data?.candidates ? data?.candidates[0]?.output : "",
-          },
-        ]);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "There was a problem with your request.",
-        });
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+
+    submitUserChat();
   };
 
   useEffect(() => {
