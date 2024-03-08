@@ -4,15 +4,18 @@ import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
+import { toast } from "../ui/use-toast";
+import { ChatResponseInterface, Result } from "./chat.interface";
+import Message from "./Message";
 
 type Props = {};
 
 const Chat = (props: Props) => {
   const [text, setText] = useState<string>("");
-  const [results, setResults] = useState<Results[] | null>([]);
+  const [results, setResults] = useState<Result[] | null>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const chatRef = useRef<HTMLDivElement | null>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,6 +23,9 @@ const Chat = (props: Props) => {
     if (!text.length || loading) return;
 
     setLoading(true);
+
+    setResults((prev) => [...(prev ?? []), { from: "user", message: text }]);
+    setText("");
     try {
       const resp = await fetch(
         `https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=${process.env.NEXT_PUBLIC_API_KEY}`,
@@ -36,16 +42,22 @@ const Chat = (props: Props) => {
           }),
         }
       );
-      const data: ChatResponseInterface = await resp.json();
-      setResults((prev) => [
-        ...(prev ?? []),
-        { from: "user", message: text },
-        {
-          from: "bot",
-          message: data?.candidates ? data?.candidates[0]?.output : "",
-        },
-      ]);
-      setText("");
+      if (resp.ok) {
+        const data: ChatResponseInterface = await resp.json();
+        setResults((prev) => [
+          ...(prev ?? []),
+          {
+            from: "bot",
+            message: data?.candidates ? data?.candidates[0]?.output : "",
+          },
+        ]);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request.",
+        });
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -64,31 +76,22 @@ const Chat = (props: Props) => {
     <>
       <main className="flex-1 bg-gray-100/50 dark:bg-gray-800/50 h-[calc(100vh-180px)] overflow-auto">
         <div className="container flex flex-col gap-4 px-4 md:px-6 py-4 md:py-8 ">
-          <div className="mx-auto max-w-[600px] space-y-4">
+          <div className="mx-auto max-w-[600px] min-w-[300px] space-y-4">
             <div className="space-y-4">
               {!results?.length ? (
-                <p>Type a message, to start chatting...</p>
+                <p>Type a message to start chatting...</p>
               ) : (
-                results?.map((result, index) => {
-                  if (result.from === "user") {
-                    return (
-                      <div className="flex flex-col items-end space-y-2">
-                        <div className="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
-                          <p className="text-sm">{result.message}</p>
-                        </div>
-                      </div>
-                    );
-                  } else if (result.from === "bot") {
-                    return (
-                      <div
-                        ref={results?.length - 1 === index ? chatRef : null}
-                        className="p-4 rounded-lg bg-gray-200 dark:bg-gray-850"
-                      >
-                        <p className="text-sm">{result.message}</p>
-                      </div>
-                    );
-                  } else return <></>;
-                })
+                <div className="space-y-4">
+                  {results?.map((result, index) => (
+                    <Message
+                      result={result}
+                      key={`${index}-${result?.message}`}
+                      ref={results.length - 1 === index ? chatRef : null}
+                    />
+                  ))}
+
+                  {loading && <LoadingSkeleton />}
+                </div>
               )}
             </div>
           </div>
@@ -116,13 +119,12 @@ const Chat = (props: Props) => {
 
 export default Chat;
 
-interface Results {
-  from: "user" | "bot";
-  message: string;
-}
-
-interface ChatResponseInterface {
-  candidates: {
-    output: string;
-  }[];
-}
+const LoadingSkeleton = () => {
+  return (
+    <div className="p-4 w-fit rounded-lg bg-gray-200 dark:bg-gray-850 flex items-center space-x-2">
+      <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
+      <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
+      <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
+    </div>
+  );
+};
