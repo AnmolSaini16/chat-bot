@@ -3,7 +3,7 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { ArrowUp, BotMessageSquare, Loader2 } from "lucide-react";
+import { ArrowUp, Bot, BotMessageSquare, Loader2 } from "lucide-react";
 import { Result } from "./chat.interface";
 import Message from "./Message";
 import useSubmitUserChat from "@/hooks/useSubmitUserChat";
@@ -43,29 +43,31 @@ const Chat = (props: Props) => {
   return (
     <div className=" bg-gray-100/50 dark:bg-gray-800/50">
       <ChatHeader />
-      <main className="flex flex-col justify-between h-[calc(100vh-60px)]">
-        <div className="container flex flex-col gap-4 px-4 md:px-6 py-4 md:py-8 overflow-auto">
-          <div className="mx-auto max-w-[800px] min-w-[400px] space-y-4">
-            <div className="space-y-4">
-              {!results?.length ? (
-                <p>Type a message to start chatting...</p>
-              ) : (
-                <div className="space-y-4">
-                  {results?.map((result, index) => (
-                    <Message
-                      result={result}
-                      key={`${index}-${result?.message}`}
-                      ref={results.length - 1 === index ? chatRef : null}
-                    />
-                  ))}
-                  {loading && <LoadingSkeleton />}
-                </div>
-              )}
-            </div>
+      <main className="flex flex-col justify-between h-[calc(100vh-60px)] mx-auto">
+        <div className="container py-6 overflow-auto">
+          <div className="mx-auto w-[80%] space-y-4">
+            {!results?.length ? (
+              <p className="text-center">Type a message to start chatting...</p>
+            ) : (
+              <div className="space-y-4">
+                {results?.map((result, index) => (
+                  <Message
+                    result={result}
+                    key={`${index}-${result?.message}`}
+                    ref={results.length - 1 === index ? chatRef : null}
+                  />
+                ))}
+                {loading && <LoadingSkeleton />}
+              </div>
+            )}
           </div>
         </div>
-        <div className="container px-4 md:px-6 py-4 md:py-8">
-          <form className="flex items-center space-x-3" onSubmit={handleSubmit}>
+
+        <div className="container p-4">
+          <form
+            className="flex items-center space-x-3 mx-auto w-[80%]"
+            onSubmit={handleSubmit}
+          >
             <Input
               className="flex-1 min-w-0"
               placeholder="Type a message..."
@@ -92,10 +94,16 @@ export default Chat;
 
 const LoadingSkeleton = () => {
   return (
-    <div className="p-4 w-fit rounded-lg bg-gray-700 flex items-center space-x-2">
-      <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
-      <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
-      <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
+    <div className="flex items-center gap-2">
+      <div className="self-start">
+        <Bot />
+      </div>
+
+      <div className="p-4 w-fit rounded-lg bg-gray-700 flex items-center space-x-2">
+        <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
+        <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
+        <div className="w-3 h-3 bg-gray-400 rounded-full animate-ping"></div>
+      </div>
     </div>
   );
 };
