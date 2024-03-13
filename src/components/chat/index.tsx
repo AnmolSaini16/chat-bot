@@ -111,11 +111,8 @@ const LoadingSkeleton = () => {
 export const ChatHeader = () => {
   return (
     <header className="p-2">
-      <Button
-        variant="outline"
-        className="text-md bg-transparent rounded-full uppercase"
-      >
-        Chatbot <BotMessageSquare className="ml-2" />
+      <Button variant="link">
+        REQUMATOR <BotMessageSquare className="ml-2" />
       </Button>
     </header>
   );
