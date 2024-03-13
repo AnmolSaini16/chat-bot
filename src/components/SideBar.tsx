@@ -13,10 +13,10 @@ const SideBar = (props: Props) => {
         <header className="sticky top-0 z-10 dark:border-gray-800">
           <div className="container flex items-center justify-between h-14 px-4 md:px-6">
             <h1 className="text-lg font-semibold flex items-center">
-              <Image src="/logo.png" width={60} height={60} alt="logo" />
+              <Image src="/logo.png" width={100} height={100} alt="logo" />
             </h1>
-            <Button size="sm" variant="outline">
-              Contact us
+            <Button asChild size="sm" variant="outline">
+              <Link href="https://www.amdocs.com/contact">Contact us</Link>
             </Button>
           </div>
         </header>
@@ -30,8 +30,10 @@ const SideBar = (props: Props) => {
       </div>
 
       <div className="mt-auto p-4">
-        <Button size="sm" variant="outline">
-          <Headset className="mr-2 h-4 w-4" /> Support
+        <Button asChild size="sm" variant="outline">
+          <Link href="https://www.amdocs-support.com/aps?id=aps_login">
+            <Headset className="mr-2 h-4 w-4" /> Support
+          </Link>
         </Button>
       </div>
     </div>
