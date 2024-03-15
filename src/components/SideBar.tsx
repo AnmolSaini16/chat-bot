@@ -16,7 +16,7 @@ const SideBar = (props: Props) => {
               <Image src="/logo.png" width={100} height={100} alt="logo" />
             </h1>
             <Button asChild size="sm" variant="outline">
-              <Link href="https://www.amdocs.com/contact">Contact us</Link>
+                Contact us
             </Button>
           </div>
         </header>
@@ -31,9 +31,7 @@ const SideBar = (props: Props) => {
 
       <div className="mt-auto p-4">
         <Button asChild size="sm" variant="outline">
-          <Link href="https://www.amdocs-support.com/aps?id=aps_login">
             <Headset className="mr-2 h-4 w-4" /> Support
-          </Link>
         </Button>
       </div>
     </div>
